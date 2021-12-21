@@ -7,16 +7,20 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController , BeastCellDelegate {
     
     var textFieldArray = [String]()
 
+    @IBOutlet weak var descriptionLabel: UILabel!
+    
+    
     @IBOutlet weak var taskTextField: UITextField!
     @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.dataSource = self
+        tableView.delegate = self
     }
 
     @IBAction func beastButton(_ sender: UIButton){
@@ -25,12 +29,17 @@ class ViewController: UIViewController {
         textFieldArray.append(task)
         tableView.reloadData()
         taskTextField.text = ""
+            
         }
     }
     
+    func showTaskDescription(description: String) {
+            descriptionLabel.text = description
+        }
+    
 }
 
-extension ViewController: UITableViewDataSource {
+extension ViewController: UITableViewDataSource , UITableViewDelegate {
     
 
     // How many cells are we going to need?
@@ -45,14 +54,28 @@ extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Get the UITableViewCell and create/populate it with data then return it
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as! BeastTableViewCell
                 // set text label to the model that is corresponding to the row in array
-        cell.textLabel?.text = textFieldArray[indexPath.row]
+        cell.taskLabel.text = textFieldArray[indexPath.row]
+        
+        // This line is very important! Now the cell has a reference to the view controller itself.
+        cell.delegate = self
+        
                 // return cell so that Table View knows what to render in each row
             return cell
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+       
+        textFieldArray.remove(at: indexPath.row)
+        tableView.reloadData()
+    }
+
 
 }
+
+
+
 
 
 
